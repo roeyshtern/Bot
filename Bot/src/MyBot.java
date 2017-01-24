@@ -186,7 +186,6 @@ public class MyBot implements PirateBot {
 
 			}
 			game.setSail(drone, sailOptions.get(choice));
-
 		}
 	}
 
