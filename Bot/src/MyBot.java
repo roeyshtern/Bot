@@ -1,3 +1,5 @@
+package bots;
+
 import java.util.*;
 
 import pirates.*;
@@ -38,11 +40,20 @@ public class MyBot implements PirateBot {
 			if (tryAttack(thisMove.p, game) == false) {
 				List<Location> sailOptions = game.getSailOptions(thisMove.p, thisMove.d);
 				// sail to the destination
-				game.setSail(thisMove.p, sailOptions.get(0));
+				if (sailOptions.size() > 1)
+				{
+					game.setSail(thisMove.p, sailOptions.get(1));
+				}
+				else
+				{
+			    	game.setSail(thisMove.p, sailOptions.get(0));
+				}
 			}
 			// remove all the object that have the pirate or the location
 			myList = updateList(myList, thisMove.d, thisMove.p, game);
 		}
+		
+	
 
 		droneMove(game);
 
@@ -82,11 +93,10 @@ public class MyBot implements PirateBot {
 		List<Island> enemyIsland = game.getEnemyIslands();
 
 		for (int i = 0; i < myPirate.size(); i++) {
-
-			if (enemyIsland.size() == 4) {
+			
+			if (enemyIsland.size() > 2) {
 				mul = 1;
-				dev = 2;
-
+				dev = 3;
 			}
 
 			for (int j = 0; j < enemyPirates.size(); j++) {
@@ -104,10 +114,16 @@ public class MyBot implements PirateBot {
 						myPirate.get(i).distance(droneList.get(k))));
 			}
 			for (int j = 0; j < enemyIsland.size(); j++) {
+				
+				if(enemyIsland.get(j).id == 1)
+				{
+					mul = 100;
+					dev = 105;
+				}
+				
 				destList.add(new PirateAndDestination(myPirate.get(i), enemyIsland.get(j).location,
 						myPirate.get(i).distance(enemyIsland.get(j))*mul/dev));
 			}
-
 		}
 
 		return destList;
@@ -143,6 +159,7 @@ public class MyBot implements PirateBot {
 
 	private void droneMove(PirateGame game) {
 		int choice = 0;
+		int counter = 0;
 		boolean flag = false;
 		// Go over all of my drones
 		for (Drone drone : game.getMyLivingDrones()) {
@@ -150,7 +167,7 @@ public class MyBot implements PirateBot {
 			flag = false;
 			City destination = game.getMyCities().get(0);
 			List<Location> sailOptions = game.getSailOptions(drone, destination);
-			if (sailOptions.size() > 1) {
+			if (sailOptions.size() > 1 ) {
 				for (Pirate pirate : game.getEnemyLivingPirates()) {
 					if (drone.location.row == pirate.location.row) {
 						game.debug(drone.id + " there is pirate in my row");
@@ -166,7 +183,7 @@ public class MyBot implements PirateBot {
 
 					if ((destination.location.row == pirate.location.row
 							|| destination.location.row == pirate.location.row + 1
-							|| destination.location.row == pirate.location.row - 1) && flag == false) {
+							|| destination.location.row == pirate.location.row - 1) && flag == false && destination.location.col >= pirate.location.col - 2) {
 						if (destination.inRange(pirate, 5)) {
 							flag = true;
 						}
@@ -175,7 +192,7 @@ public class MyBot implements PirateBot {
 					}
 					if ((destination.location.col == pirate.location.col
 							|| destination.location.col == pirate.location.col + 1
-							|| destination.location.col == pirate.location.col - 1) && flag == false) {
+							|| destination.location.col == pirate.location.col - 1) && flag == false && destination.location.row >= pirate.location.row - 2) {
 						if (destination.inRange(pirate, 5)) {
 							flag = true;
 						}
@@ -186,6 +203,7 @@ public class MyBot implements PirateBot {
 
 			}
 			game.setSail(drone, sailOptions.get(choice));
+
 		}
 	}
 
