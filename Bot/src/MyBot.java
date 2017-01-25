@@ -7,10 +7,12 @@ import pirates.*;
 
 /*
  * TODO:
- * 1. find which city is the closest 
+ * 1. add commend to the code
  * 2. find which island is the closest to my city
  * 3. find which island is the closest to enemy city
+ * 4. find which city is the closest
  */
+
 public class MyBot implements PirateBot {
 
 	/*
