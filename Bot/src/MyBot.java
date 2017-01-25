@@ -4,6 +4,13 @@ import java.util.*;
 
 import pirates.*;
 
+
+/*
+ * TODO:
+ * 1. find which city is the closest 
+ * 2. find which island is the closest to my city
+ * 3. find which island is the closest to enemy city
+ */
 public class MyBot implements PirateBot {
 
 	/*
@@ -22,8 +29,6 @@ public class MyBot implements PirateBot {
 		}
 
 	}
-
-	Random rnd = new Random();
 
 	public void doTurn(PirateGame game) {
 
