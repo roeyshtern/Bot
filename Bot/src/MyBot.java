@@ -1,20 +1,18 @@
-package bots;
+//package bots;
 
 import java.util.*;
 
 import pirates.*;
 
-
-/*
- * TODO:
- * 1. add commend to the code
- * 2. find which island is the closest to my city
- * 3. find which island is the closest to enemy city
- * 4. find which city is the closest
- */
-
 public class MyBot implements PirateBot {
 
+	/*
+	 * TODO:
+	 * 1. add commend to the code
+	 * 2. find which island is the closest to my city
+	 * 4. find which city is the closest
+	 */
+		
 	/*
 	 * Class for the move list
 	 */
@@ -32,6 +30,10 @@ public class MyBot implements PirateBot {
 
 	}
 
+	Random rnd = new Random();
+
+	boolean lose = false;
+
 	public void doTurn(PirateGame game) {
 
 		List<PirateAndDestination> myList = setList(game);
@@ -47,20 +49,15 @@ public class MyBot implements PirateBot {
 			if (tryAttack(thisMove.p, game) == false) {
 				List<Location> sailOptions = game.getSailOptions(thisMove.p, thisMove.d);
 				// sail to the destination
-				if (sailOptions.size() > 1)
-				{
+				if (sailOptions.size() > 1) {
 					game.setSail(thisMove.p, sailOptions.get(1));
-				}
-				else
-				{
-			    	game.setSail(thisMove.p, sailOptions.get(0));
+				} else {
+					game.setSail(thisMove.p, sailOptions.get(0));
 				}
 			}
 			// remove all the object that have the pirate or the location
 			myList = updateList(myList, thisMove.d, thisMove.p, game);
 		}
-		
-	
 
 		droneMove(game);
 
@@ -100,10 +97,16 @@ public class MyBot implements PirateBot {
 		List<Island> enemyIsland = game.getEnemyIslands();
 
 		for (int i = 0; i < myPirate.size(); i++) {
-			
-			if (enemyIsland.size() > 2) {
-				mul = 1;
-				dev = 3;
+
+			if (enemyIsland.size() > 2 && lose == false) {
+				mul = 9;
+				dev = 24;
+			}
+
+			if (game.getMyScore() < game.getEnemyScore()) {
+				lose = true;
+				mul = 25;
+				dev = 48;
 			}
 
 			for (int j = 0; j < enemyPirates.size(); j++) {
@@ -113,7 +116,7 @@ public class MyBot implements PirateBot {
 
 			for (int k = 0; k < islandList.size(); k++) {
 				destList.add(new PirateAndDestination(myPirate.get(i), islandList.get(k).location,
-						myPirate.get(i).distance(islandList.get(k))*mul/dev));
+						myPirate.get(i).distance(islandList.get(k)) * mul / dev));
 			}
 
 			for (int k = 0; k < droneList.size(); k++) {
@@ -121,22 +124,23 @@ public class MyBot implements PirateBot {
 						myPirate.get(i).distance(droneList.get(k))));
 			}
 			for (int j = 0; j < enemyIsland.size(); j++) {
-				
-				if(enemyIsland.get(j).id == 1)
+
+				if (game.getEnemyIslands().size() > 0)
 				{
-					mul = 100;
-					dev = 105;
+					if (enemyIsland.get(j).id == findClosestEnemyIslandToEnemyCity(game).id) {
+						mul = 100;
+						dev = 105;
+					}
 				}
-				
 				destList.add(new PirateAndDestination(myPirate.get(i), enemyIsland.get(j).location,
-						myPirate.get(i).distance(enemyIsland.get(j))*mul/dev));
+						myPirate.get(i).distance(enemyIsland.get(j)) * mul / dev));
 			}
 		}
 
 		return destList;
 	}
 
-	public List<PirateAndDestination> updateList(List<PirateAndDestination> destList, Location loc, Pirate p,
+	private List<PirateAndDestination> updateList(List<PirateAndDestination> destList, Location loc, Pirate p,
 			PirateGame game) {
 		PirateAndDestination pirateDest;
 		for (int i = 0; i < destList.size(); i++) {
@@ -146,7 +150,26 @@ public class MyBot implements PirateBot {
 				i = i - 1;
 			}
 		}
+
 		return destList;
+	}
+	
+	private Island findClosestEnemyIslandToEnemyCity(PirateGame game)
+	{
+
+		Island closest = game.getAllIslands().get(0);
+		City myCity = game.getEnemyCities().get(0);
+		
+		for (Island thisIsland : game.getAllIslands()) 
+		{
+			if(myCity.distance(thisIsland) < myCity.distance(closest))
+			{
+				closest = thisIsland;
+			}
+		}
+		
+		
+		return closest;
 	}
 
 	private boolean tryAttack(Pirate pirate, PirateGame game) {
@@ -173,36 +196,34 @@ public class MyBot implements PirateBot {
 			flag = false;
 			City destination = game.getMyCities().get(0);
 			List<Location> sailOptions = game.getSailOptions(drone, destination);
-			if (sailOptions.size() > 1 ) {
+			if (sailOptions.size() > 1) {
 				for (Pirate pirate : game.getEnemyLivingPirates()) {
 					if (drone.location.row == pirate.location.row) {
-						game.debug(drone.id + " there is pirate in my row");
 						choice = 0;
 						flag = true;
 					}
 
 					if (drone.location.col == pirate.location.col) {
-						game.debug(drone.id + " there is pirate in my col");
 						choice = 1;
 						flag = true;
 					}
 
 					if ((destination.location.row == pirate.location.row
 							|| destination.location.row == pirate.location.row + 1
-							|| destination.location.row == pirate.location.row - 1) && flag == false && destination.location.col >= pirate.location.col - 2) {
+							|| destination.location.row == pirate.location.row - 1) && flag == false
+							&& destination.location.col >= pirate.location.col - 2) {
 						if (destination.inRange(pirate, 5)) {
 							flag = true;
 						}
-						game.debug("there is pirate in row of city   " + pirate.id);
 						choice = 1;
 					}
 					if ((destination.location.col == pirate.location.col
 							|| destination.location.col == pirate.location.col + 1
-							|| destination.location.col == pirate.location.col - 1) && flag == false && destination.location.row >= pirate.location.row - 2) {
+							|| destination.location.col == pirate.location.col - 1) && flag == false
+							&& destination.location.row >= pirate.location.row - 2) {
 						if (destination.inRange(pirate, 5)) {
 							flag = true;
 						}
-						game.debug("there is pirate in col of city   " + pirate.id);
 						choice = 0;
 					}
 				}
