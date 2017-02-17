@@ -146,7 +146,6 @@ public class MyBot implements PirateBot {
 				i = i - 1;
 			}
 		}
-
 		return destList;
 	}
 
