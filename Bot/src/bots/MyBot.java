@@ -255,30 +255,22 @@ public class MyBot implements PirateBot {
      */
     private void dronesMove(PirateGame game)
     {
-
     	int moveChoice = 0;
-
     	Drone drone;
-
     	List<PossibleMove> dronesMoves = setDronesMovesList(game);
-
     	Location destination;
 
     	Collections.sort(dronesMoves);
 
     	for (PossibleMove possibleMove : dronesMoves) { 		
-
     		if (possibleMove.toMove == false)
     			continue;
 
     		drone = (Drone)possibleMove.aircraft;
-
     		destination = chooseDroneDest(drone, game);   
-
-    		dronesMoves.get(0).destAircraft = possibleMove.aircraft; //To delete
-
+    		possibleMove.destAircraft = possibleMove.aircraft; //To delete
     		List<Location> sailOptions = game.getSailOptions(drone, destination);
-
+    		
     		if (sailOptions.size() > 1)
     			moveChoice = checkDroneSail(drone, destination, game);
     		else
@@ -339,29 +331,18 @@ public class MyBot implements PirateBot {
     		distanceCityeRow = drone.location.row - destination.row;
     		distanceCityeCol = drone.location.col - destination.col;
 
-    		if (distanceDroneCol <= 1 && distanceDroneCol >= -1)
+    		if ((distanceDroneCol <= 1 && distanceDroneCol >= -1) || (distanceCityeRow <= 1 && distanceCityeRow >= -1 && enemyInTheWay == false))
     		{
     			moveChoice = 1;
     			enemyInTheWay = true;
     		}
 
-    		if (distanceDroneRow <= 1 && distanceDroneRow >= -1)
+    		if ((distanceDroneRow <= 1 && distanceDroneRow >= -1) || distanceCityeCol <= 1 && distanceCityeCol >= -1 && enemyInTheWay == false)
     		{
     			moveChoice = 0;
     			enemyInTheWay = true;
     		}
 
-    		if(distanceCityeCol <= 1 && distanceCityeCol >= -1 && enemyInTheWay == false)
-    		{
-    			moveChoice = 0;
-    			enemyInTheWay = true;
-    		}
-
-    		if(distanceCityeRow <= 1 && distanceCityeRow >= -1 && enemyInTheWay == false)
-    		{
-    			moveChoice = 1;
-    			enemyInTheWay = true;
-    		}
     	}
 
     	return moveChoice;
