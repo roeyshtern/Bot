@@ -9,6 +9,7 @@ import pirates.*;
 
 public class MyBot implements PirateBot {
 
+	//you are gay
 	public class PossibleMove{
 		private Aircraft aircraft;
 		private GameObject destAircraft;
